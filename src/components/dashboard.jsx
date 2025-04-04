@@ -11,7 +11,7 @@ function Dashboard() {
     useEffect(()=>{
         async function fetchData(){
             try {
-                const response = await api.get("https://bricks-1i79.onrender.com/dashboard")
+                const response = await api.get("https://bricksapp-backend.onrender.com/dashboard")
                 if (!response.data.registered) {
                     navigate("/signin")
                 }
@@ -26,7 +26,7 @@ function Dashboard() {
     }, [updateRegistrationStatus])
 
     async function LogoutBtn(){
-       const response = await api.post("https://bricks-1i79.onrender.com/logout")
+       const response = await api.post("https://bricksapp-backend.onrender.com/logout")
        if (!response.data.failed) {
         navigate("/signin")
        }

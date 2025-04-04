@@ -11,9 +11,14 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: process.env.PORT || 4173,
+    port: 4173,
   },
   preview: {
     allowedHosts: ['bricks-1i79.onrender.com'],
   },
+  build: {
+    outDir: 'dist'
+  }
 });
+
+

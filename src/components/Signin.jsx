@@ -21,7 +21,7 @@ function Signin() {
 
     useEffect(()=>{
         const checkRegistration = async () => {
-            const response = await api.get('https://bricks-1i79.onrender.com/isAuthenticated')
+            const response = await api.get('https://bricksapp-backend.onrender.com/isAuthenticated')
             if (response.data.authenticated) {
                 navigate("/")
             }
@@ -33,7 +33,7 @@ function Signin() {
     const SigninBtn = async (event) => {
         event.preventDefault();
         try {
-            const response = await api.post('https://bricks-1i79.onrender.com/signin', { email, password })
+            const response = await api.post('https://bricksapp-backend.onrender.com/signin', { email, password })
             console.log(response.data)
             if (response.data.success) {
                 navigate("/")

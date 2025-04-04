@@ -18,7 +18,7 @@ const WalletContextConsumer = () => {
 
     useEffect(() => {
         async function fetchData() {
-            const response = await api.get("https://bricks-1i79.onrender.com/get-wallet")
+            const response = await api.get("https://bricksapp-backend.onrender.com/get-wallet")
             // , { credentials: "include" }
             const result = response.data
             if (result) {
@@ -39,7 +39,7 @@ const WalletContextConsumer = () => {
         const handleDisconnect = async () => {
             console.log("🚫 Wallet disconnected");
             try {
-                await api.post("https://bricks-1i79.onrender.com/disconnect-wallet")
+                await api.post("https://bricksapp-backend.onrender.com/disconnect-wallet")
                 setAddress("No Wallet Connected");
                 setIsConnected(false);
             } catch (error) {
@@ -69,7 +69,7 @@ const WalletContextConsumer = () => {
 
             async function fetchData() {
                 try {
-                    const response = await api.post("https://bricks-1i79.onrender.com/connect-wallet", { address: walletAddress })
+                    const response = await api.post("https://bricksapp-backend.onrender.com/connect-wallet", { address: walletAddress })
                     const result = response.data.address
                     if (result) {
                         setAddress(result)
