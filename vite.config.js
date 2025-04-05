@@ -14,7 +14,7 @@ export default defineConfig({
     port: 4173,
   },
   preview: {
-    allowedHosts: ['bricks-1i79.onrender.com'],
+    allowedHosts: ['https://bricksapp-frontend.onrender.com'],
   },
   build: {
     outDir: 'dist'

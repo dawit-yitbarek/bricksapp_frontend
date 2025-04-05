@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://bricks-1i79.onrender.com",
+  baseURL: "https://bricksapp-backend.onrender.com",
   withCredentials: true,
 });
 
