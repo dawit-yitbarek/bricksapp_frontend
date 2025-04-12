@@ -40,7 +40,7 @@ header h1 {
   height: 20px;
   width: 50px;
   border: none;
-  background-color: coral;
+  /* background-color: coral; */
   color: black;
 }
 
@@ -56,4 +56,19 @@ footer p {
   color: #ccc;
 }
 
+.spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid black;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+}
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

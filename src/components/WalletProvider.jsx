@@ -19,14 +19,13 @@ const WalletContextConsumer = () => {
     useEffect(() => {
         async function fetchData() {
             const response = await api.get("https://bricksapp-backend.onrender.com/get-wallet")
-            // , { credentials: "include" }
+           
             const result = response.data
             if (result) {
                 setAddress(result.address)
                 console.log(result);
 
-                // const walletProvider = wallets.find((w) => w.readyState === "Installed");
-                // if (walletProvider) select(walletProvider.adapter.name);
+
             } else {
                 setAddress("Not connected")
             }
