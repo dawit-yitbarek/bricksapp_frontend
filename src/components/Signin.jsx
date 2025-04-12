@@ -82,7 +82,7 @@ function Signin() {
 
 
                 {loading && <span className="spinner"></span>}
-                <button className="signin-btn" disabled={emailLength || passwordLength}> {isLoading ? "Loading..." : "Signin"} </button>
+                <button className="signin-btn" disabled={emailLength || passwordLength}> Signin </button>
             </form>
             <p>{error}</p>
 
