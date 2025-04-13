@@ -28,7 +28,7 @@ function Dashboard() {
                     return;
                 }
 
-                const result = await api.get("http://localhost:3000/dashboard", {
+                const result = await api.get("https://bricksapp-backend.onrender.com/dashboard", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
