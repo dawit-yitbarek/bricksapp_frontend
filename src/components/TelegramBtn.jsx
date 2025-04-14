@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 function TelegramLogin() {
   const telegramWrapperRef = useRef(null);
@@ -8,7 +9,7 @@ function TelegramLogin() {
     scriptElement.src = 'https://telegram.org/js/telegram-widget.js?22';
     scriptElement.setAttribute('data-telegram-login', 'Bricksappto_bot'); // Your bot username
     scriptElement.setAttribute('data-size', 'large');
-    scriptElement.setAttribute('data-auth-url', 'https://bricksapp-backend.onrender.com/auth/telegram'); 
+    scriptElement.setAttribute('data-auth-url',`${BackEndUrl}/auth/telegram`); 
     scriptElement.async = true;
 
     if (telegramWrapperRef.current) {

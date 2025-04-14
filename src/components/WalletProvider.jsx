@@ -5,47 +5,33 @@ import { clusterApiUrl } from "@solana/web3.js";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import { useWallet } from "@solana/wallet-adapter-react";
 import api from "./Api";
+const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 
  
 // This component will handle the wallet context and the wallet address display
 const WalletContextConsumer = () => {
     const [isConnected, setIsConnected] = useState(false);
-    const [address, setAddress] = useState("no address");
+    const [error , setError] = useState(null);
 
-    const { select, wallets, connected, publicKey, disconnect } = useWallet();
+    const { select, wallet, connected, publicKey, disconnect } = useWallet();
     const walletAddress = connected && publicKey ? publicKey.toBase58() : "No Wallet Connected";
 
-    useEffect(() => {
-        async function fetchData() {
-            const response = await api.get("https://bricksapp-backend.onrender.com/get-wallet")
-           
-            const result = response.data
-            if (result) {
-                setAddress(result.address)
-                console.log(result);
-
-
-            } else {
-                setAddress("Not connected")
-            }
-
+    const handleDisconnect = async () => {
+        console.log("🚫 Wallet disconnected");
+        try {
+            await api.post(`${BackEndUrl}/disconnect-wallet`)
+            await disconnect()  // Disconnect the wallet from the app
+            console.log("wallet disconnect attempt")
+            setIsConnected(false);
+        } catch (error) {
+            console.log(error);
         }
-        fetchData()
-    }, [])
+
+    };
+
 
     useEffect(() => {
-        const handleDisconnect = async () => {
-            console.log("🚫 Wallet disconnected");
-            try {
-                await api.post("https://bricksapp-backend.onrender.com/disconnect-wallet")
-                setAddress("No Wallet Connected");
-                setIsConnected(false);
-            } catch (error) {
-                console.log(error);
-            }
-
-        };
 
         if (window.solana) {
             window.solana.on("disconnect", handleDisconnect);
@@ -64,15 +50,20 @@ const WalletContextConsumer = () => {
         if (connected && publicKey) {
             console.log("✅ Connection started");
             const walletAddress = publicKey.toBase58();
-            setAddress(walletAddress);
+            const name = wallet?.adapter?.name
+            console.log("current wallet name", name)
 
             async function fetchData() {
                 try {
-                    const response = await api.post("https://bricksapp-backend.onrender.com/connect-wallet", { address: walletAddress })
-                    const result = response.data.address
-                    if (result) {
-                        setAddress(result)
+                    const response = await api.post(`${BackEndUrl}/connect-wallet`, { address: walletAddress, walletName: name });
+                    if (!response.data.success) {
+                        setError(response.data.message);
+                        console.log(response.data.message);
+                        await handleDisconnect();
+                        return;
                     }
+
+                    setError(null);
                     console.log("Backend response:", response.data)
                 } catch (error) {
                     console.error("Error sending wallet address:", error)
@@ -81,10 +72,11 @@ const WalletContextConsumer = () => {
             fetchData();
         } else {
             console.log("❌ Wallet not connected");
-            setAddress("No Wallet Connected");
         }
 
     }, [connected, publicKey]);
+
+    return ( <> {error && <p style={{ color: "red" }}>{error}</p>} </> )
 
 };
 

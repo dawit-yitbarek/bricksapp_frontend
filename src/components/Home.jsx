@@ -3,6 +3,7 @@ import { AuthContext } from "./AuthContext";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useNavigate } from "react-router-dom";
 import api from "./Api";
+const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 function Home() {
     const [email, setEmail] = useState("no email");
@@ -11,7 +12,7 @@ function Home() {
     useEffect(()=>{
         async function fetchData(){
             try {
-                const response = await api.get("https://bricksapp-backend.onrender.com/home")
+                const response = await api.get(`${BackEndUrl}/home`)
                 if (!response.data.registered) {
                     navigate("/signin")
                 }
@@ -26,7 +27,7 @@ function Home() {
     }, [updateRegistrationStatus])
 
     async function LogoutBtn(){
-       const response = await api.post("https://bricksapp-backend.onrender.com/logout")
+       const response = await api.post(`${BackEndUrl}/logout`)
        if (!response.data.failed) {
         navigate("/signin")
        }

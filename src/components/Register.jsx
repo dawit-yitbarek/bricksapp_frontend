@@ -3,6 +3,7 @@ import api from "./Api";
 import ValidateInput from "./ValidateInput";
 import GoogleLogin from "./GoogleBtn"
 import { useNavigate } from "react-router-dom";
+const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 function Register(props) {
    const navigate = useNavigate()
@@ -26,7 +27,7 @@ function Register(props) {
 
     useEffect(()=>{
         const checkRegistration = async () => {
-            const response = await api.post('https://bricksapp-backend.onrender.com/refresh')
+            const response = await api.post(`${BackEndUrl}/refresh`)
             if (response.data.success) {
                 navigate("/")
             }
@@ -39,7 +40,7 @@ function Register(props) {
         event.preventDefault();
 
         try {
-            const response = await api.post('https://bricksapp-backend.onrender.com/register', { email, password })
+            const response = await api.post(`${BackEndUrl}/register`, { email, password })
             console.log(response.data)
              if (response.data.success) {
                 setVisibleVerify(true)
@@ -94,7 +95,7 @@ function Register(props) {
         setLoading(true)
         event.preventDefault()
         try {
-            const response = await api.post('https://bricksapp-backend.onrender.com/verify-email', { code, email });
+            const response = await api.post(`${BackEndUrl}/verify-email`, { code, email });
             if (response.data.success) {
                 localStorage.setItem("accessToken", response.data.accessToken);
                 navigate("/")

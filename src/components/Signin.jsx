@@ -3,7 +3,7 @@ import api from "./Api";
 import GoogleLogin from "./GoogleBtn";
 import TelegramLogin from "./TelegramBtn";
 import { Navigate, useNavigate } from "react-router-dom";
-
+const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 function Signin() {
     const [error, setError] = useState("")
@@ -20,7 +20,7 @@ function Signin() {
     useEffect(() => {
         const checkRegistration = async () => {
             try {
-                const response = await api.post('https://bricksapp-backend.onrender.com/refresh')
+                const response = await api.post(`${BackEndUrl}/refresh`)
                 if (response.data.success) {
                     navigate("/")
                 }
@@ -36,7 +36,7 @@ function Signin() {
         setLoading(true)
         event.preventDefault();
         try {
-            const response = await api.post('https://bricksapp-backend.onrender.com/signin', { email, password })
+            const response = await api.post(`${BackEndUrl}/signin`, { email, password })
             console.log(response.data)
             if (response.data.success) {
                 localStorage.setItem("accessToken", response.data.accessToken);
@@ -45,7 +45,7 @@ function Signin() {
                 setError(response.data.message)
             }
         } catch (error) {
-            console.log(error);
+            console.log("error from signin component", error);
         }finally{
             setLoading(false)
         }

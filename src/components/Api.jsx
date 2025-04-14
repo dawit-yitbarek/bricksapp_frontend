@@ -1,7 +1,8 @@
 import axios from "axios";
+const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 const api = axios.create({
-  baseURL: "https://bricksapp-backend.onrender.com",
+  baseURL: BackEndUrl,
   withCredentials: true,
 });
 

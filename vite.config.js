@@ -10,15 +10,11 @@ export default defineConfig({
     include: ['buffer'],
   },
   server: {
-    host: '0.0.0.0',
-    port: 4173,
-  },
-  preview: {
-    allowedHosts: ['https://bricksapp-frontend.onrender.com'],
+    host: '0.0.0.0', // Needed for local testing
   },
   build: {
-    outDir: 'dist'
-  }
+    outDir: 'dist',
+  },
 });
 
 

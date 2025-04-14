@@ -15,26 +15,29 @@ const App = () => {
 
 
     return (
-        <WalletProviderComponent>
-            <AuthProvider>
-                <div>
 
-                    <Header />
+        <AuthProvider>
+            <div>
 
-                    <Router>
-                        <Routes>
-                            <Route path="/" element={<Dashboard />} />
-                            <Route path="/signin" element={<Signin />} />
-                            <Route path="/register" element={<Register />} />
-                        </Routes>
-                    </Router>
+                <Header />
 
-                    <TelegramLogin />
-                    <Footer />
+                <Router>
+                    <Routes>
+                        <Route path="/" element={
+                            <WalletProviderComponent>
+                                <Dashboard />
+                            </WalletProviderComponent>
+                            } />
+                        <Route path="/signin" element={<Signin />} />
+                        <Route path="/register" element={<Register />} />
+                    </Routes>
+                </Router>
 
-                </div>
-            </AuthProvider>
-        </WalletProviderComponent>
+                <TelegramLogin />
+                <Footer />
+
+            </div>
+        </AuthProvider>
     );
 };
 
