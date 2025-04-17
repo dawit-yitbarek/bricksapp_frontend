@@ -1,34 +1,25 @@
-import React, { useEffect } from "react";
+import React from "react";
 
-const TelegramConnectPage = () => {
-  useEffect(() => {
-    window.TelegramLoginWidget = {
-      dataOnauth: (user) => {
-        console.log("Telegram user connected:", user);
-      },
-    };
+const TelegramConnect = () => {
+  const handleTelegramLogin = () => {
+    const botName = "Bricksappto_bot";
+    const redirectUri = encodeURIComponent("https://bricksapp-backend.onrender.com/refresh");
 
-    const script = document.createElement("script");
-    script.src = "https://telegram.org/js/telegram-widget.js?7";
-    script.setAttribute("data-telegram-login", "Bricksappto_bot");
-    script.setAttribute("data-size", "large");
-    script.setAttribute("data-userpic", "false");
-    script.setAttribute("data-radius", "10");
-    script.setAttribute("data-request-access", "write");
-    script.setAttribute("data-onauth", "TelegramLoginWidget.dataOnauth(user)");
-    script.async = true;
+    const url = `https://oauth.telegram.org/auth?bot=${botName}&origin=${window.location.origin}&embed=1&request_access=write&redirect_uri=${redirectUri}`;
 
-    document.getElementById("telegram-button-container").appendChild(script);
-  }, []);
+    window.open(url, "_blank", "width=500,height=500");
+  };
 
   return (
-    <div>
-      <div>
-        <h1>Connect your Telegram</h1>
-        <div id="telegram-button-container" />
-      </div>
+    <div className="flex justify-center items-center h-screen bg-gray-900">
+      <button
+        onClick={handleTelegramLogin}
+        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg text-lg font-semibold"
+      >
+        Connect Telegram
+      </button>
     </div>
   );
 };
 
-export default TelegramConnectPage;
+export default TelegramConnect;
