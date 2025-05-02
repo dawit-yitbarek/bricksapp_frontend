@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
-import checkAndRefreshToken from "./checkRegistration";
+import checkAndRefreshToken from "./CheckRegistration";
 import api from "./Api";
 
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;

@@ -6,7 +6,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import { useWallet } from "@solana/wallet-adapter-react";
 import api from "./Api";
 import { WalletErrorContext } from "./WalletErrorContext";
-import checkAndRefreshToken from "./checkRegistration";
+import checkAndRefreshToken from "./CheckRegistration";
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 

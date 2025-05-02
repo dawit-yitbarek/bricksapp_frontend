@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { LogOut } from "lucide-react";
 import { useWalletError } from "./WalletErrorContext";
-import checkAndRefreshToken from "./checkRegistration";
+import checkAndRefreshToken from "./CheckRegistration";
 import {
   Connection,
   PublicKey,

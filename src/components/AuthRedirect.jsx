@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import checkAndRefreshToken from "./checkRegistration";
+import checkAndRefreshToken from "./CheckRegistration";
 import CheckingAuth from "./CheckingAuth";
 
 function AuthRedirect({ children, signin_up }) {

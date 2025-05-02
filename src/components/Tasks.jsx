@@ -4,7 +4,7 @@ import SolanaInvestment from "./SolanaInvestment";
 import { useSearchParams } from 'react-router-dom';
 import TelegramConnect from "./TelegramConnect";
 import InviteFriendSection from "./InviteTask";
-import checkAndRefreshToken from "./checkRegistration";
+import checkAndRefreshToken from "./CheckRegistration";
 import Header from "./Header";
 import Footer from "./Footer";
 
