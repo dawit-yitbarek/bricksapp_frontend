@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import WalletProviderComponent from "./WalletProvider";
-import Dashboard from './Dashboard'
 import Signin from "./Signin";
 import Register from "./Register";
 import Landing from "./Landing";
+import Dashboard from './Dashboard'
 import Tasks from './Tasks';
 import Leaderboard from './Leaderboard';
 import ForgotPassword from './ForgotPassword';
