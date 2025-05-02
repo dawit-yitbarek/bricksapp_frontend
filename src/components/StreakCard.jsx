@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import checkAndRefreshToken from "./checkRegistration";
+import checkAndRefreshToken from "./CheckRegistration";
 import { Flame } from "lucide-react";
 import LoadingSpinner from "./LoadingSpinner"
 import api from "./Api"
