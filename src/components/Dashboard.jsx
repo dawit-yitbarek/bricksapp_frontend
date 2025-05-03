@@ -21,15 +21,17 @@ const Dashboard = () => {
   const [referBonus, setReferBonus] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [streakLoding, setStreakLoading] = useState(false)
   const { error } = useWalletError();
 
   useEffect(() => {
-    setIsSpinning(true)
     async function fetchData() {
+      setStreakLoading(true)
+      setIsSpinning(true)
       try {
         const accessToken = localStorage.getItem("accessToken");
-        const referbonus = await api.get(`${BackendUrl}/get-referral-bonus`, {headers: {Authorization: `Bearer ${accessToken}`,},} );
-        const response = await api.get(`${BackendUrl}/dashboard`, {headers: {Authorization: `Bearer ${accessToken}`,},});
+        const referbonus = await api.get(`${BackendUrl}/get-referral-bonus`, { headers: { Authorization: `Bearer ${accessToken}`, }, });
+        const response = await api.get(`${BackendUrl}/dashboard`, { headers: { Authorization: `Bearer ${accessToken}`, }, });
 
         if (response.data.success) {
           setUserInfo(response.data);
@@ -42,8 +44,12 @@ const Dashboard = () => {
         setReferBonus(referbonus.data?.updated.total_bonus);
       } catch (error) {
         console.log("error on fetching data from dashboard ", error)
+      } finally {
+        setStreakLoading(false)
+        setTimeout(() => {
+          setIsSpinning(false);
+        }, 1000)
       }
-
     }
 
     fetchData();
@@ -52,9 +58,6 @@ const Dashboard = () => {
     elements.forEach(el => {
       el.style.animation = "float 3s ease-in-out infinite";
     });
-    setTimeout(() => {
-      setIsSpinning(false);
-    }, 1000)
   }, [refreshFlag, navigate]);
 
 
@@ -193,6 +196,7 @@ const Dashboard = () => {
             userInfo={userInfo}
             isClaimed={userInfo?.claimed}
             refresh={() => setRefreshFlag((prev) => prev + 1)}
+            streakLoding={streakLoding}
           />
         </section>
       </main>
