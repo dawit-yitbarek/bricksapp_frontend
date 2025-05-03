@@ -24,8 +24,8 @@ function Tasks() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const accessToken = localStorage.getItem("accessToken"); 
-        const response = await api.get(`${BackEndUrl}/user-task`, {headers: {Authorization: `Bearer ${accessToken}`,},});
+        const accessToken = localStorage.getItem("accessToken");
+        const response = await api.get(`${BackEndUrl}/user-task`, { headers: { Authorization: `Bearer ${accessToken}`, }, });
         if (response.data.success) {
           setCompletedTasks(response.data.completedTasks || []);
           setIncompletedTasks(response.data.incompleteTasks || []);
@@ -42,8 +42,8 @@ function Tasks() {
   const handleTaskCompletion = async (taskId, reward_point) => {
     try {
       await checkAndRefreshToken();
-      const accessToken = localStorage.getItem("accessToken");  
-      await api.post(`${BackEndUrl}/complete-task`, { taskId, reward_point }, {headers: {Authorization: `Bearer ${accessToken}`,},});
+      const accessToken = localStorage.getItem("accessToken");
+      await api.post(`${BackEndUrl}/complete-task`, { taskId, reward_point }, { headers: { Authorization: `Bearer ${accessToken}`, }, });
     } catch (error) {
       console.error("Error completing task:", error);
     } finally {
@@ -144,17 +144,14 @@ function Tasks() {
         </div>
 
 
-        <div className="mt-16 border-t border-gray-800 rounded-md pt-10">
-          <h2 className="text-3xl font-extrabold mb-6">
-            💸 Investment Tasks
-          </h2>
-          <SolanaInvestment />
-        </div>
+        {/* Invest Solana Section */}
+        <SolanaInvestment />
 
 
-        </main>
 
-        <Footer />
+      </main>
+
+      <Footer />
     </div>
   );
 }
