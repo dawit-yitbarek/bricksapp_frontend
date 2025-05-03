@@ -100,10 +100,10 @@ const StreakCard = (props) => {
             : `🎁 Claim today's bonus: ${props.currentStreak * 1000} points`}
         </p>
 
-        {!loading ?
+        {!loading && !props.streakLoding ?
           <button
             onClick={claimDailyReward}
-            disabled={props.isClaimed}
+            disabled={props.isClaimed || props.streakLoding}
             className={`px-6 py-2 rounded-full font-medium transition-colors ${props.isClaimed
               ? "bg-gray-500 cursor-not-allowed"
               : "bg-purple-600 hover:bg-purple-700"
