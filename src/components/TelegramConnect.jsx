@@ -37,7 +37,7 @@ const TelegramConnect = (props) => {
     const url = `https://oauth.telegram.org/auth?bot_id=${BotId}&origin=${window.location.origin}&request_access=write&redirect_uri=${redirectUri}`;
   
     // Open a popup with width and height
-    window.open(url, "_blank", "width=500,height=600");
+    window.location.href = url;
   };
   
 
