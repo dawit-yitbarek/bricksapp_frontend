@@ -12,6 +12,7 @@ import AuthRedirect from './AuthRedirect';
 import NotFound from './Notfound';
 import Terms from './Terms';
 import Privacy from './Privacy';
+import TelegramRedirect from "./TelegramRedirect"
 
 
 
@@ -77,6 +78,8 @@ const App = () => {
                         </AuthRedirect>
                     } />
 
+
+                    <Route path="/telegram-redirect" element={<TelegramRedirect />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
 
