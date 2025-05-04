@@ -98,7 +98,7 @@ const SolanaInvestment = () => {
       }
       );
 
-      setStatus(response.data.message);
+      setStatus(response.data?.message);
     } catch (err) {
       console.error(err);
       setStatus("❌ Transaction failed.");
@@ -114,8 +114,8 @@ const SolanaInvestment = () => {
       <div
         key={task.id}
         className={`rounded-xl p-4 sm:p-5 mb-4 shadow-md border text-sm sm:text-base ${isCompleted
-            ? "bg-gray-800 border-gray-700"
-            : "bg-gray-850 border-purple-700"
+          ? "bg-gray-800 border-gray-700"
+          : "bg-gray-850 border-purple-700"
           }`}
       >
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
@@ -145,10 +145,10 @@ const SolanaInvestment = () => {
                 !connected || !publicKey || loadingTaskId === task.id || isCompleted
               }
               className={`w-full sm:w-auto text-center ${isCompleted
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : !connected || !publicKey
-                    ? "bg-gray-700 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
+                ? "bg-gray-600 cursor-not-allowed"
+                : !connected || !publicKey
+                  ? "bg-gray-700 cursor-not-allowed"
+                  : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
                 } px-4 py-2 rounded-lg text-white font-semibold transition`}
             >
               {loadingTaskId === task.id
@@ -159,6 +159,7 @@ const SolanaInvestment = () => {
             </button>
 
             {task.id === errorId && !isCompleted && (
+              status === 'Sending transaction...' || status === 'Transaction verified' ? <p className="text-white mt-1 text-xs">{status}</p> : 
               <p className="text-red-400 mt-1 text-xs">{status}</p>
             )}
 
@@ -178,9 +179,9 @@ const SolanaInvestment = () => {
       <h2 className="text-3xl font-extrabold mb-6">
         💸 Investment Tasks
       </h2>
-      <div className="p-4 sm:p-6 bg-gray-900 text-white min-h-screen">
+      <div className="p-4 sm:p-6 bg-gray-900 text-white">
         <div className="w-full max-w-2xl mx-auto">
-          {!connected || !publicKey ? (
+          {incompleteTasks.length > 0 && (!connected || !publicKey ? (
             <div className="mb-6">
               <WalletMultiButton />
 
@@ -220,6 +221,12 @@ const SolanaInvestment = () => {
                 </button>
               </div>
             </div>
+          ))}
+
+          {incompleteTasks.length === 0 && (
+            <div className="text-center text-gray-400 mx-10">
+              <p>No Investment tasks available at the moment 🚧</p>
+            </div>
           )}
 
           {/* Incomplete Tasks */}
@@ -241,6 +248,8 @@ const SolanaInvestment = () => {
               {completedTasks.map((task) => renderTaskCard(task, true))}
             </>
           )}
+
+
         </div>
       </div>
     </div>

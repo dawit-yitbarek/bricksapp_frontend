@@ -35,10 +35,10 @@ function Leaderboard() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-[#0c0c1c] text-white font-sans overflow-x-hidden">
-      <main>
-        <Header leaderboard={true} />
+    <div className="min-h-screen w-full bg-[#0c0c1c] text-white font-sans">
+      <Header leaderboard={true} />
 
+      <main>
         <section className="px-4 py-10 flex flex-col items-center gap-10 w-full max-w-full">
           {/* Page Header */}
           <header className="w-full max-w-3xl text-center px-2">
@@ -54,11 +54,10 @@ function Leaderboard() {
             {topThree.map((user) => (
               <article
                 key={user.id}
-                className={`w-full h-64 rounded-xl flex flex-col items-center justify-center px-4 py-6 bg-[#1a1a2e] text-center ${
-                  user.rank == 1
+                className={`w-full h-64 rounded-xl flex flex-col items-center justify-center px-4 py-6 bg-[#1a1a2e] text-center ${user.rank == 1
                     ? "sm:col-span-2 md:col-span-1 order-1"
                     : "order-2"
-                }`}
+                  }`}
               >
                 <div className="w-20 h-20 rounded-full overflow-hidden mb-3 border-4 border-purple-500">
                   <img
