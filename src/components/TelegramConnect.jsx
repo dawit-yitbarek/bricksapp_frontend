@@ -31,15 +31,15 @@ const TelegramConnect = (props) => {
 
  
 
-
   const handleTelegramLogin = () => {
-
     const redirectUri = encodeURIComponent(`${FrontEndUrl}/telegram-redirect`);
-
-    const url = `https://oauth.telegram.org/auth?bot_id=${BotId}&origin=${window.location.origin}&embed=1&request_access=write&redirect_uri=${redirectUri}`;
-
-    window.open(url);
+  
+    const url = `https://oauth.telegram.org/auth?bot_id=${BotId}&origin=${window.location.origin}&request_access=write&redirect_uri=${redirectUri}`;
+  
+    // Open a popup with width and height
+    window.open(url, "_blank", "width=500,height=600");
   };
+  
 
   return (
     !isConnected ?
