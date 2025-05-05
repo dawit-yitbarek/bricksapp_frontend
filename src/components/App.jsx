@@ -13,6 +13,7 @@ import NotFound from './Notfound';
 import Terms from './Terms';
 import Privacy from './Privacy';
 import TelegramRedirect from "./TelegramRedirect"
+import Ping from './Ping'
 
 
 
@@ -27,10 +28,11 @@ const App = () => {
                 <Routes>
 
                     <Route path="/" element={
-                        <WalletProviderComponent>
                             <Landing />
-                        </WalletProviderComponent>
                     } />
+                    
+                    {/* A component to wake the app every 5 minute */}
+                    <Route path="/ping" element={<Ping />} />
 
 
                     {/* Protected Routes */}
