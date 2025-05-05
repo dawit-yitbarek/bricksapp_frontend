@@ -35,6 +35,8 @@ function Tasks() {
         setTgConnectError(searchParams.get('tgError'));
       } catch (error) {
         console.error("Error fetching tasks:", error);
+      }finally{
+        setTaskLoading(false)
       }
     };
 
@@ -51,7 +53,6 @@ function Tasks() {
       console.error("Error completing task:", error);
     } finally {
       setRefreshFlag((prev) => prev + 1);
-      setTaskLoading(false)
     }
   };
 
