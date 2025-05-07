@@ -1,32 +1,27 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useContext } from "react";
 import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { clusterApiUrl } from "@solana/web3.js";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import { useWallet } from "@solana/wallet-adapter-react";
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-  TorusWalletAdapter,
-  LedgerWalletAdapter
-} from "@solana/wallet-adapter-wallets";
 import api from "./Api";
 import { WalletErrorContext } from "./WalletErrorContext";
-import checkAndRefreshToken from "./CheckRegistration";
+import checkAndRefreshToken from "./checkRegistration";
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
-// Wallet Context Consumer to handle connection/disconnection
+
+
+// This component will handle the wallet context and the wallet address display
 const WalletContextConsumer = ({ children }) => {
   const [error, setError] = useState(null);
+
   const { wallet, connected, publicKey, disconnect } = useWallet();
 
   const handleDisconnect = async () => {
     try {
-      await checkAndRefreshToken();
+      await checkAndRefreshToken()
       const accessToken = localStorage.getItem("accessToken");
-      await api.post(`${BackEndUrl}/disconnect-wallet`, {}, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      await api.post(`${BackEndUrl}/disconnect-wallet`, {} , { headers: { Authorization: `Bearer ${accessToken}`, }, });
       await disconnect();
     } catch (error) {
       console.log(error);
@@ -37,6 +32,7 @@ const WalletContextConsumer = ({ children }) => {
     if (window.solana) {
       window.solana.on("disconnect", handleDisconnect);
     }
+
     return () => {
       if (window.solana) {
         window.solana.off("disconnect", handleDisconnect);
@@ -51,15 +47,13 @@ const WalletContextConsumer = ({ children }) => {
 
       async function fetchData() {
         try {
-          await checkAndRefreshToken();
+          await checkAndRefreshToken()
           const accessToken = localStorage.getItem("accessToken");
           const response = await api.post(`${BackEndUrl}/connect-wallet`, {
             address: walletAddress,
             walletName: name,
-          }, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
-
+          },{ headers: { Authorization: `Bearer ${accessToken}`, }, }
+        );
           if (!response.data.success) {
             setError(response.data.message);
             await handleDisconnect();
@@ -68,7 +62,7 @@ const WalletContextConsumer = ({ children }) => {
 
           setError(null);
         } catch (error) {
-          setError("Failed to connect wallet");
+          setError("Failed to connect wallet")
           console.error("Error sending wallet address:", error);
         }
       }
@@ -84,20 +78,15 @@ const WalletContextConsumer = ({ children }) => {
   );
 };
 
-// Main Wallet Provider Component
-const WalletProviderComponent = ({ children }) => {
-  const endpoint = clusterApiUrl("devnet");
 
-  const wallets = useMemo(() => [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-    new TorusWalletAdapter(),
-    new LedgerWalletAdapter()
-  ], []);
+// This component will wrap the app in the necessary providers
+const WalletProviderComponent = ({ children }) => {
+  const endpoint = clusterApiUrl("mainnet-beta");
+  const wallet = useMemo(() => [], []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallet} autoConnect>
         <WalletModalProvider>
           <WalletContextConsumer>
             {children}
@@ -107,5 +96,6 @@ const WalletProviderComponent = ({ children }) => {
     </ConnectionProvider>
   );
 };
+
 
 export default WalletProviderComponent;
