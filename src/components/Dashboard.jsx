@@ -96,7 +96,7 @@ const Dashboard = () => {
       console.error("Wallet disconnect error:", error);
     } finally {
       setDisconnecting(false);
-      if(desktop) setRefreshFlag((prev) => prev + 1) 
+      if(!desktop) setRefreshFlag((prev) => prev + 1)
     }
   }
 

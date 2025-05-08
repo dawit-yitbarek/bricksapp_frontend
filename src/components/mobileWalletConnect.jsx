@@ -27,14 +27,21 @@ const MobileConnectButton = () => {
   };
 
   return (
-    <button
-      onClick={connectViaDeepLink}
-      disabled={loading}
-      className="px-4 py-2 bg-purple-600 text-white rounded"
-    >
-      {loading ? <LoadingSpinner /> : "Connect Wallet mobile"}
-    </button>
+    <>
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <button
+          onClick={connectViaDeepLink}
+          disabled={loading}
+          className="px-4 py-2 bg-purple-600 text-white rounded"
+        >
+          Connect Wallet mobile
+        </button>
+      )}
+    </>
   );
+
 };
 
 export default MobileConnectButton;
