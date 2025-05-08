@@ -7,6 +7,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import api from "./Api";
 import { WalletErrorContext } from "./WalletErrorContext";
 import checkAndRefreshToken from "./CheckRegistration";
+import CheckDevice from "./mobileOrDesktop";
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 
@@ -21,7 +22,7 @@ const WalletContextConsumer = ({ children }) => {
     try {
       await checkAndRefreshToken()
       const accessToken = localStorage.getItem("accessToken");
-      await api.post(`${BackEndUrl}/disconnect-wallet`, {} , { headers: { Authorization: `Bearer ${accessToken}`, }, });
+      await api.post(`${BackEndUrl}/disconnect-wallet`, {}, { headers: { Authorization: `Bearer ${accessToken}`, }, });
       await disconnect();
     } catch (error) {
       console.log(error);
@@ -29,47 +30,40 @@ const WalletContextConsumer = ({ children }) => {
   };
 
   useEffect(() => {
-    if (window.solana) {
-      window.solana.on("disconnect", handleDisconnect);
-    }
+    (async () => {
+      const device = await CheckDevice();
 
-    return () => {
-      if (window.solana) {
-        window.solana.off("disconnect", handleDisconnect);
-      }
-    };
-  }, []);
+      if (device.desktop) {
+        if (connected && publicKey) {
+          const walletAddress = publicKey.toBase58();
+          const name = wallet?.adapter?.name;
 
-  useEffect(() => {
-    if (connected && publicKey) {
-      const walletAddress = publicKey.toBase58();
-      const name = wallet?.adapter?.name;
+          try {
+            await checkAndRefreshToken();
+            const accessToken = localStorage.getItem("accessToken");
+            const response = await api.post(`${BackEndUrl}/connect-wallet`, {
+              address: walletAddress,
+              walletName: name,
+            }, {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            });
 
-      async function fetchData() {
-        try {
-          await checkAndRefreshToken()
-          const accessToken = localStorage.getItem("accessToken");
-          const response = await api.post(`${BackEndUrl}/connect-wallet`, {
-            address: walletAddress,
-            walletName: name,
-          },{ headers: { Authorization: `Bearer ${accessToken}`, }, }
-        );
-          if (!response.data.success) {
-            setError(response.data.message);
-            await handleDisconnect();
-            return;
+            if (!response.data.success) {
+              setError(response.data.message);
+              await handleDisconnect();
+              return;
+            }
+
+            setError(null);
+          } catch (error) {
+            setError("Failed to connect wallet");
+            console.error("Error sending wallet address:", error);
           }
-
-          setError(null);
-        } catch (error) {
-          setError("Failed to connect wallet")
-          console.error("Error sending wallet address:", error);
         }
       }
-
-      fetchData();
-    }
+    })();
   }, [connected, publicKey]);
+
 
   return (
     <WalletErrorContext.Provider value={{ error, setError }}>
