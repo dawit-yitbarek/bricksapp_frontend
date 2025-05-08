@@ -14,6 +14,7 @@ import Terms from './Terms';
 import Privacy from './Privacy';
 import TelegramRedirect from "./TelegramRedirect"
 import Ping from './Ping'
+import PhantomRedirect from './PhantomRedirect';
 
 
 
@@ -28,9 +29,9 @@ const App = () => {
                 <Routes>
 
                     <Route path="/" element={
-                            <Landing />
+                        <Landing />
                     } />
-                    
+
                     {/* A component to wake the app every 5 minute */}
                     <Route path="/ping" element={<Ping />} />
 
@@ -58,6 +59,13 @@ const App = () => {
                             <Leaderboard />
                         </AuthRedirect>
                     } />
+
+                    <Route path="/phantom-redirect" element={
+                        <AuthRedirect signin_up={false}>
+                            <PhantomRedirect />
+                        </AuthRedirect>
+                    } />
+
                     {/* Protected Routes */}
 
 

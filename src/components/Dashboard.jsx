@@ -10,22 +10,43 @@ import Footer from "./Footer";
 import api from "./Api";
 import { LogoutBtn } from "./Header";
 import LoadingSpinner from "./LoadingSpinner";
+import CheckDevice from "./mobileOrDesktop";
+import MobileConnectButton from "./mobileWalletConnect";
+import checkAndRefreshToken from "./CheckRegistration";
 
 const BackendUrl = import.meta.env.VITE_BACKEND_URL;
 const FrontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { connected, publicKey, disconnect } = useWallet();
+  const wallet = useWallet();
+  const [publicKey, setPublicKey] = useState(null);
+  const [connected, setConnected] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const [userInfo, setUserInfo] = useState();
   const [referBonus, setReferBonus] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [streakLoding, setStreakLoading] = useState(false);
+  const [streakLoading, setStreakLoading] = useState(false);
   const [goTaskLoading, setGoTaskLoading] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
+  const [desktop, setDesktop] = useState(true)
   const { error } = useWalletError();
+
+  useEffect(() => {
+    (async () => {
+      const device = await CheckDevice();
+      if (!device.desktop) {
+        setDesktop(false);
+        setPublicKey(device.address);
+        setConnected(!!device.address);
+      } else {
+        setDesktop(true);
+        setPublicKey(wallet.publicKey);
+        setConnected(wallet.connected);
+      }
+    })();
+  }, [wallet.connected, wallet.publicKey]);  
 
   useEffect(() => {
     async function fetchData() {
@@ -64,11 +85,18 @@ const Dashboard = () => {
   async function walletDisconnect() {
     setDisconnecting(true);
     try {
-      await disconnect();
+      if (desktop) {
+        await wallet.disconnect()
+      }else{
+        await checkAndRefreshToken()
+        const accessToken = localStorage.getItem("accessToken");
+        await api.post(`${BackendUrl}/disconnect-wallet`, {} , { headers: { Authorization: `Bearer ${accessToken}`, }, });
+      }
     } catch (error) {
       console.error("Wallet disconnect error:", error);
     } finally {
       setDisconnecting(false);
+      if(desktop) setRefreshFlag((prev) => prev + 1) 
     }
   }
 
@@ -106,14 +134,15 @@ const Dashboard = () => {
             {connected && publicKey ? (
               <div className="flex items-center gap-2 text-sm sm:text-base">
                 <p className="font-mono text-purple-400">
-                  <abbr title={publicKey?.toBase58()} className="cursor-pointer no-underline">
-                    {publicKey?.toBase58().slice(0, 4)}...{publicKey?.toBase58().slice(-4)}
+                  <abbr title={desktop ? publicKey?.toBase58() : publicKey} className="cursor-pointer no-underline">
+                    {desktop ? publicKey?.toBase58().slice(0, 4) : publicKey?.slice(0, 4)}...
+                    {desktop ? publicKey?.toBase58().slice(-4) : publicKey?.slice(-4)}
                   </abbr>
                 </p>
-                <button disabled={disconnecting} 
-                className="text-red-400 hover:text-red-600"
-                title="Disconnect Wallet" 
-                onClick={walletDisconnect}>
+                <button disabled={disconnecting}
+                  className="text-red-400 hover:text-red-600"
+                  title="Disconnect Wallet"
+                  onClick={walletDisconnect}>
                   {disconnecting ? 'Disconnecting...' :
                     <LogOut className="w-5 h-5" />
                   }
@@ -122,7 +151,7 @@ const Dashboard = () => {
             ) : (
               <>
                 <div className="mt-3">
-                  <WalletMultiButton />
+                  {desktop ? <WalletMultiButton /> : <MobileConnectButton />}
                 </div>
                 {error && (
                   <p className="text-sm text-red-500 mt-2">{error}</p>
@@ -220,7 +249,7 @@ const Dashboard = () => {
             userInfo={userInfo}
             isClaimed={userInfo?.claimed}
             refresh={() => setRefreshFlag((prev) => prev + 1)}
-            streakLoding={streakLoding}
+            streakLoading={streakLoading}
           />
         </section>
       </main>

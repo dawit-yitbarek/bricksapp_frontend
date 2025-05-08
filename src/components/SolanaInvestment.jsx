@@ -1,49 +1,69 @@
 import React, { useState, useEffect } from "react";
 import { LogOut } from "lucide-react";
-import { useWalletError } from "./WalletErrorContext";
-import checkAndRefreshToken from "./CheckRegistration";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import {
   Connection,
   PublicKey,
   Transaction,
   SystemProgram,
 } from "@solana/web3.js";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { useWallet } from "@solana/wallet-adapter-react";
 import api from "./Api";
+import CheckDevice from "./mobileOrDesktop";
+import MobileConnectButton from "./mobileWalletConnect";
+import { useWalletError } from "./WalletErrorContext";
+import checkAndRefreshToken from "./CheckRegistration";
 
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 const Rpc_Url = import.meta.env.VITE_RPC_URL;
-
 const connection = new Connection(Rpc_Url, "confirmed");
 const receiverAddress = "A7PB8vLhPAh93QCpgZFTuHWY6tq7rQGHfByxy3CjyRWr";
 
 const SolanaInvestment = () => {
-  const [status, setStatus] = useState("");
-  const [errorId, setErrorId] = useState(null);
-  const [loadingTaskId, setLoadingTaskId] = useState(null);
-  const { connected, publicKey, sendTransaction, disconnect } = useWallet();
+  const wallet = useWallet();
+  const { error } = useWalletError();
+  const [publicKey, setPublicKey] = useState(null);
+  const [connected, setConnected] = useState(false);
+  const [desktop, setDesktop] = useState(true);
   const [completedTasks, setCompletedTasks] = useState([]);
   const [incompleteTasks, setIncompleteTasks] = useState([]);
   const [refreshFlag, setRefreshFlag] = useState(0);
-  const { error } = useWalletError();
+  const [status, setStatus] = useState("");
+  const [errorId, setErrorId] = useState(null);
+  const [loadingTaskId, setLoadingTaskId] = useState(null);
+  const [disconnecting, setDisconnecting] = useState(false)
 
   useEffect(() => {
+    (async () => {
+      const device = await CheckDevice();
+      if (!device.desktop) {
+        setDesktop(false);
+        setPublicKey(device.address);
+        setConnected(!!device.address);
+      } else {
+        setDesktop(true);
+        setPublicKey(wallet.publicKey);
+        setConnected(wallet.connected);
+      }
+    })();
+
     const fetchTasks = async () => {
       try {
-        const accessToken = localStorage.getItem("accessToken");
-        const response = await api.get(`${BackEndUrl}/investment-tasks`, { headers: { Authorization: `Bearer ${accessToken}`, }, });
+        const token = localStorage.getItem("accessToken");
+        const response = await api.get(`${BackEndUrl}/investment-tasks`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (response.data.success) {
           setCompletedTasks(response.data.completedTasks || []);
           setIncompleteTasks(response.data.incompleteTasks || []);
         }
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
+      } catch (err) {
+        console.error("Error fetching tasks:", err);
       }
     };
 
     fetchTasks();
-  }, [refreshFlag]);
+  }, [wallet.connected, wallet.publicKey, refreshFlag]);
 
   const handleInvest = async (taskId, amount, reward) => {
     try {
@@ -51,51 +71,50 @@ const SolanaInvestment = () => {
       setLoadingTaskId(taskId);
       setStatus("Sending transaction...");
 
-      if (!publicKey || !sendTransaction) {
+      if (!publicKey) {
         setStatus("Wallet not connected.");
         return;
       }
 
-      const fromPubkey = publicKey;
+      const fromPubkey = new PublicKey(publicKey);
       const toPubkey = new PublicKey(receiverAddress);
       const lamports = amount * 1e9;
 
       const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey,
-          toPubkey,
-          lamports,
-        })
+        SystemProgram.transfer({ fromPubkey, toPubkey, lamports })
       );
-
-      transaction.feePayer = fromPubkey;
 
       const { blockhash, lastValidBlockHeight } =
         await connection.getLatestBlockhash("confirmed");
 
+      transaction.feePayer = fromPubkey;
       transaction.recentBlockhash = blockhash;
       transaction.lastValidBlockHeight = lastValidBlockHeight;
 
-      const signature = await sendTransaction(transaction, connection);
+      const signature = await wallet.sendTransaction(transaction, connection);
 
       await connection.confirmTransaction(
         { signature, blockhash, lastValidBlockHeight },
         "confirmed"
       );
 
-      await checkAndRefreshToken()
+      await checkAndRefreshToken();
       const token = localStorage.getItem("accessToken");
-      const response = await api.post(`${BackEndUrl}/verify-transaction`, {
-        signature,
-        amount,
-        fromPubkey: fromPubkey.toBase58(),
-        taskId,
-        reward
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
+
+      const response = await api.post(
+        `${BackEndUrl}/verify-transaction`,
+        {
+          signature,
+          amount,
+          fromPubkey: fromPubkey.toBase58(),
+          taskId,
+          reward,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      }
       );
 
       setStatus(response.data?.message);
@@ -109,13 +128,38 @@ const SolanaInvestment = () => {
   };
 
 
+  const handleDisconnect = async () => {
+    if (desktop) {
+      try {
+        setDisconnecting(true)
+        await wallet.disconnect();
+      } catch (err) {
+        console.error("Error disconnecting wallet:", err);
+      } finally {
+        setDisconnecting(false)
+      }
+    } else {
+      try {
+        setDisconnecting(true)
+        await checkAndRefreshToken()
+        const accessToken = localStorage.getItem("accessToken");
+        await api.post(`${BackEndUrl}/disconnect-wallet`, {}, { headers: { Authorization: `Bearer ${accessToken}`, }, });
+      } catch (error) {
+        console.log("error on disconnecting wallet for mobile ", error)
+      } finally {
+        setDisconnecting(false)
+        setRefreshFlag((prev) => prev + 1);
+      }
+    }
+  };
+
   const renderTaskCard = (task, isCompleted) => {
     return (
       <div
         key={task.id}
         className={`rounded-xl p-4 sm:p-5 mb-4 shadow-md border text-sm sm:text-base ${isCompleted
-          ? "bg-gray-800 border-gray-700"
-          : "bg-gray-850 border-purple-700"
+            ? "bg-gray-800 border-gray-700"
+            : "bg-gray-850 border-purple-700"
           }`}
       >
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
@@ -145,10 +189,10 @@ const SolanaInvestment = () => {
                 !connected || !publicKey || loadingTaskId === task.id || isCompleted
               }
               className={`w-full sm:w-auto text-center ${isCompleted
-                ? "bg-gray-600 cursor-not-allowed"
-                : !connected || !publicKey
-                  ? "bg-gray-700 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : !connected || !publicKey
+                    ? "bg-gray-700 cursor-not-allowed"
+                    : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
                 } px-4 py-2 rounded-lg text-white font-semibold transition`}
             >
               {loadingTaskId === task.id
@@ -159,8 +203,14 @@ const SolanaInvestment = () => {
             </button>
 
             {task.id === errorId && !isCompleted && (
-              status === 'Sending transaction...' || status === 'Transaction verified' ? <p className="text-white mt-1 text-xs">{status}</p> : 
-              <p className="text-red-400 mt-1 text-xs">{status}</p>
+              <p
+                className={`mt-1 text-xs ${status.includes("❌")
+                    ? "text-red-400"
+                    : "text-white"
+                  }`}
+              >
+                {status}
+              </p>
             )}
 
             {!connected && !isCompleted && (
@@ -176,15 +226,12 @@ const SolanaInvestment = () => {
 
   return (
     <div className="mt-16 border-t border-gray-800 rounded-md pt-10">
-      <h2 className="text-3xl font-extrabold mb-6">
-        💸 Investment Tasks
-      </h2>
+      <h2 className="text-3xl font-extrabold mb-6">💸 Investment Tasks</h2>
       <div className="p-4 sm:p-6 bg-gray-900 text-white">
         <div className="w-full max-w-2xl mx-auto">
           {incompleteTasks.length > 0 && (!connected || !publicKey ? (
             <div className="mb-6">
-              <WalletMultiButton />
-
+              {desktop ? <WalletMultiButton /> : <MobileConnectButton />}
               {error ? (
                 <p className="text-sm text-red-500 px-3 py-2 rounded-md mt-2 text-center">
                   {error}
@@ -200,24 +247,25 @@ const SolanaInvestment = () => {
               <p className="text-sm sm:text-md text-gray-300 mb-1">
                 ✅ Wallet Connected
               </p>
-
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
                 <p className="text-base sm:text-lg font-mono text-purple-400 break-all">
                   <abbr
-                    title={publicKey?.toBase58()}
+                    title={desktop ? publicKey?.toBase58() : publicKey}
                     className="cursor-pointer no-underline"
                   >
-                    {publicKey?.toBase58().slice(0, 4)}...
-                    {publicKey?.toBase58().slice(-4)}
+                    {desktop ? publicKey?.toBase58().slice(0, 4) : publicKey?.slice(0, 4)}...
+                    {desktop ? publicKey?.toBase58().slice(-4) : publicKey?.slice(-4)}
                   </abbr>
                 </p>
-
                 <button
-                  onClick={disconnect}
+                  disabled={disconnecting}
+                  onClick={handleDisconnect}
                   className="text-red-400 hover:text-red-600"
                   title="Disconnect Wallet"
                 >
-                  <LogOut className="w-5 h-5" />
+                  {disconnecting ? 'Disconnecting...' :
+                    <LogOut className="w-5 h-5" />
+                  }
                 </button>
               </div>
             </div>
@@ -229,7 +277,6 @@ const SolanaInvestment = () => {
             </div>
           )}
 
-          {/* Incomplete Tasks */}
           {incompleteTasks.length > 0 && (
             <>
               <h2 className="text-2xl sm:text-3xl font-bold mb-4">
@@ -239,7 +286,6 @@ const SolanaInvestment = () => {
             </>
           )}
 
-          {/* Completed Tasks */}
           {completedTasks.length > 0 && (
             <>
               <h2 className="text-2xl sm:text-3xl font-bold mt-10 mb-4">
@@ -248,8 +294,6 @@ const SolanaInvestment = () => {
               {completedTasks.map((task) => renderTaskCard(task, true))}
             </>
           )}
-
-
         </div>
       </div>
     </div>
