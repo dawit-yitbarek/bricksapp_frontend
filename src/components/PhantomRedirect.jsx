@@ -54,7 +54,7 @@ const PhantomRedirect = () => {
 
         const token = localStorage.getItem("accessToken");
         await api.post(`${BackEndUrl}/connect-wallet`, {
-          walletAddress,
+          address: walletAddress,
           walletName: "Phantom",
         }, {
           headers: { Authorization: `Bearer ${token}` },
