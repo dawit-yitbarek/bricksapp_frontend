@@ -202,7 +202,7 @@ const SolanaInvestment = () => {
               onClick={() =>
                 desktop ?
                 handleInvest(task.id, task.amount_required, task.reward_point) :
-                handleInvestInMobile(task.amount_required || 0.1)
+                handleInvestInMobile(0.1)
               }
               disabled={
                 !connected || !publicKey || loadingTaskId === task.id || isCompleted
