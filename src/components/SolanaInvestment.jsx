@@ -13,6 +13,7 @@ import CheckDevice from "./mobileOrDesktop";
 import MobileConnectButton from "./mobileWalletConnect";
 import { useWalletError } from "./WalletErrorContext";
 import checkAndRefreshToken from "./CheckRegistration";
+import { handleInvestInMobile } from "./mobileWalletTransacion";
 
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 const Rpc_Url = import.meta.env.VITE_RPC_URL;
@@ -199,7 +200,9 @@ const SolanaInvestment = () => {
           <div className="relative flex flex-col items-start sm:items-center w-full sm:w-fit">
             <button
               onClick={() =>
-                handleInvest(task.id, task.amount_required, task.reward_point)
+                desktop ?
+                handleInvest(task.id, task.amount_required, task.reward_point) :
+                handleInvestInMobile(task.amount)
               }
               disabled={
                 !connected || !publicKey || loadingTaskId === task.id || isCompleted
