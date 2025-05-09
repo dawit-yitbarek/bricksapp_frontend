@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import nacl from "tweetnacl";
 import bs58 from "bs58";
 import api from "./Api";
+import { useWalletError } from "./WalletErrorContext";
 
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -18,15 +19,13 @@ const PhantomRedirect = () => {
         const nonce = searchParams.get("nonce");
 
         if (!phantomPublicKey || !data || !nonce) {
-          console.error("Missing Phantom params");
-          navigate("/dashboard");
+          navigate("/dashboard", { state: { walletError: "Missing Phantom wallet parameters." } });
           return;
         }
 
         const stored = localStorage.getItem("dapp_keypair");
         if (!stored) {
-          console.error("No dapp keypair found in localStorage");
-          navigate("/dashboard");
+          navigate("/dashboard", { state: { walletError: "No dApp keypair found. Please reconnect your wallet." } });
           return;
         }
 
@@ -45,8 +44,7 @@ const PhantomRedirect = () => {
         );
 
         if (!decrypted) {
-          console.error("Decryption failed");
-          navigate("/dashboard");
+          navigate("/dashboard", { state: { walletError: "Failed to decrypt Phantom payload." } });
           return;
         }
 
@@ -54,19 +52,18 @@ const PhantomRedirect = () => {
         const payload = JSON.parse(decoded);
         const walletAddress = payload.public_key;
 
-        console.log("Connected wallet address:", walletAddress);
-
         const token = localStorage.getItem("accessToken");
-        await api.post(`${BackEndUrl}/connect-wallet`, { walletAddress, walletName: "Phantom" }, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        await api.post(`${BackEndUrl}/connect-wallet`, {
+          walletAddress,
+          walletName: "Phantom",
+        }, {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         navigate("/dashboard");
       } catch (error) {
         console.error("Error in PhantomRedirect:", error);
-        navigate("/dashboard");
+        navigate("/dashboard", { state: { walletError: "Unexpected error during wallet connection." } });
       }
     };
 

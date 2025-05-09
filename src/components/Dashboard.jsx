@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { RefreshCw, Copy, LogOut } from "lucide-react";
 import StreakCard from "./StreakCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useWalletError } from "./WalletErrorContext";
@@ -18,6 +18,7 @@ const BackendUrl = import.meta.env.VITE_BACKEND_URL;
 const FrontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
 const Dashboard = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const wallet = useWallet();
   const [publicKey, setPublicKey] = useState(null);
@@ -32,7 +33,9 @@ const Dashboard = () => {
   const [disconnecting, setDisconnecting] = useState(false)
   const [desktop, setDesktop] = useState(true)
   const { error } = useWalletError();
+  const [walletError, setWalletError] = useState()
 
+  
   useEffect(() => {
     (async () => {
       const device = await CheckDevice();
@@ -49,6 +52,9 @@ const Dashboard = () => {
   }, [wallet.connected, wallet.publicKey]);  
 
   useEffect(() => {
+    setWalletError(location.state?.walletError)
+    // Clear walletError from location.state so it doesn't persist
+    navigate(location.pathname, { replace: true, state: {} });
     async function fetchData() {
       setStreakLoading(true);
       setIsSpinning(true);
@@ -96,6 +102,8 @@ const Dashboard = () => {
       console.error("Wallet disconnect error:", error);
     } finally {
       setDisconnecting(false);
+      setConnected(false)
+      setPublicKey(null)
       if(!desktop) setRefreshFlag((prev) => prev + 1)
     }
   }
@@ -153,8 +161,8 @@ const Dashboard = () => {
                 <div className="mt-3">
                   {desktop ? <WalletMultiButton /> : <MobileConnectButton />}
                 </div>
-                {error && (
-                  <p className="text-sm text-red-500 mt-2">{error}</p>
+                {error || walletError && (
+                  <p className="text-sm text-red-500 mt-2">{error || walletError}</p>
                 )}
               </>
             )}
