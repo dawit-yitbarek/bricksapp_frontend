@@ -84,20 +84,35 @@ const SolanaInvestment = () => {
         SystemProgram.transfer({ fromPubkey, toPubkey, lamports })
       );
 
-      const { blockhash, lastValidBlockHeight } =
-        await connection.getLatestBlockhash("confirmed");
+      const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
 
       transaction.feePayer = fromPubkey;
       transaction.recentBlockhash = blockhash;
       transaction.lastValidBlockHeight = lastValidBlockHeight;
 
-      const signature = await wallet.sendTransaction(transaction, connection);
+      let signature;
 
+      if (desktop) {
+        // For desktop wallets using Wallet Adapter
+        signature = await wallet.sendTransaction(transaction, connection);
+      } else {
+        // For mobile deep link wallets (like Phantom)
+        if (!window.solana?.signAndSendTransaction) {
+          setStatus("❌ Mobile wallet not available.");
+          return;
+        }
+
+        const signedTx = await window.solana.signAndSendTransaction(transaction);
+        signature = signedTx.signature;
+      }
+
+      // Confirm transaction
       await connection.confirmTransaction(
         { signature, blockhash, lastValidBlockHeight },
         "confirmed"
       );
 
+      // Backend verification
       await checkAndRefreshToken();
       const token = localStorage.getItem("accessToken");
 
@@ -126,6 +141,7 @@ const SolanaInvestment = () => {
       setLoadingTaskId(null);
     }
   };
+
 
 
   const handleDisconnect = async () => {
@@ -158,8 +174,8 @@ const SolanaInvestment = () => {
       <div
         key={task.id}
         className={`rounded-xl p-4 sm:p-5 mb-4 shadow-md border text-sm sm:text-base ${isCompleted
-            ? "bg-gray-800 border-gray-700"
-            : "bg-gray-850 border-purple-700"
+          ? "bg-gray-800 border-gray-700"
+          : "bg-gray-850 border-purple-700"
           }`}
       >
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
@@ -189,10 +205,10 @@ const SolanaInvestment = () => {
                 !connected || !publicKey || loadingTaskId === task.id || isCompleted
               }
               className={`w-full sm:w-auto text-center ${isCompleted
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : !connected || !publicKey
-                    ? "bg-gray-700 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
+                ? "bg-gray-600 cursor-not-allowed"
+                : !connected || !publicKey
+                  ? "bg-gray-700 cursor-not-allowed"
+                  : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
                 } px-4 py-2 rounded-lg text-white font-semibold transition`}
             >
               {loadingTaskId === task.id
@@ -205,8 +221,8 @@ const SolanaInvestment = () => {
             {task.id === errorId && !isCompleted && (
               <p
                 className={`mt-1 text-xs ${status.includes("❌")
-                    ? "text-red-400"
-                    : "text-white"
+                  ? "text-red-400"
+                  : "text-white"
                   }`}
               >
                 {status}
