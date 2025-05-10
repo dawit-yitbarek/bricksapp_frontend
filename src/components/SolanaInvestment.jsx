@@ -13,7 +13,8 @@ import CheckDevice from "./mobileOrDesktop";
 import MobileConnectButton from "./mobileWalletConnect";
 import { useWalletError } from "./WalletErrorContext";
 import checkAndRefreshToken from "./CheckRegistration";
-import { handleInvestInMobile } from "./mobileWalletTransacion";
+import SolanaInvestmentMobile from "./mobileWalletTransacion"
+
 
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 const Rpc_Url = import.meta.env.VITE_RPC_URL;
@@ -136,7 +137,7 @@ const SolanaInvestment = () => {
       setStatus(response.data?.message);
     } catch (err) {
       console.error(err);
-      setStatus("❌ Transaction failed.");
+      setStatus(err.response?.data?.message || "❌ Transaction failed.");
     } finally {
       setRefreshFlag((prev) => prev + 1);
       setLoadingTaskId(null);
@@ -198,39 +199,44 @@ const SolanaInvestment = () => {
           </span>
 
           <div className="relative flex flex-col items-start sm:items-center w-full sm:w-fit">
-            <button
-              onClick={() =>
-                desktop ?
-                handleInvest(task.id, task.amount_required, task.reward_point) :
-                handleInvestInMobile(0.1)
-              }
-              disabled={
-                !connected || !publicKey || loadingTaskId === task.id || isCompleted
-              }
-              className={`w-full sm:w-auto text-center ${isCompleted
-                ? "bg-gray-600 cursor-not-allowed"
-                : !connected || !publicKey
-                  ? "bg-gray-700 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
-                } px-4 py-2 rounded-lg text-white font-semibold transition`}
-            >
-              {loadingTaskId === task.id
-                ? "Processing..."
-                : isCompleted
-                  ? "Completed"
-                  : "Invest"}
-            </button>
 
-            {task.id === errorId && !isCompleted && (
-              <p
-                className={`mt-1 text-xs ${status.includes("❌")
-                  ? "text-red-400"
-                  : "text-white"
-                  }`}
-              >
-                {status}
-              </p>
-            )}
+            {desktop ?
+              <>
+                <button
+                  onClick={() =>
+                    handleInvest(task.id, task.amount_required, task.reward_point)
+                  }
+                  disabled={
+                    !connected || !publicKey || loadingTaskId === task.id || isCompleted
+                  }
+                  className={`w-full sm:w-auto text-center ${isCompleted
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : !connected || !publicKey
+                      ? "bg-gray-700 cursor-not-allowed"
+                      : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
+                    } px-4 py-2 rounded-lg text-white font-semibold transition`}
+                >
+                  {loadingTaskId === task.id
+                    ? "Processing..."
+                    : isCompleted
+                      ? "Completed"
+                      : "Invest"}
+                </button>
+
+                {task.id === errorId && !isCompleted && (
+                  <p
+                    className={`mt-1 text-xs ${status.includes("❌")
+                      ? "text-red-400"
+                      : "text-white"
+                      }`}
+                  >
+                    {status}
+                  </p>
+                )}
+              </>
+              :
+              <SolanaInvestmentMobile amount={task.amount_required} taskId={task.id} publicKey={publicKey} connected={connected} reward={task.reward_point} />
+            }
 
             {!connected && !isCompleted && (
               <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1 text-xs text-white bg-black bg-opacity-80 rounded shadow-lg z-10 whitespace-nowrap">
