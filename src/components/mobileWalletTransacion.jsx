@@ -11,87 +11,91 @@ const label = "Stake your solana token to get more reward.";
 
 const SolanaInvestmentMobile = (props) => {
   const [status, setStatus] = useState('');
-  const [errorId, setErrorId] = useState(null);
   const [reference, setReference] = useState('');
-  const [buttonState, setButtonState] = useState({}); // { taskId: 'stake' | 'confirm' | 'processing' }
+  const [buttonState, setButtonState] = useState('stake');
+  const [errorId, setErrorId] = useState(null)
 
   const handleInvest = () => {
-    const reference = Keypair.generate().publicKey;
-    const referenceStr = reference.toBase58();
-    setReference(referenceStr);
-
-    setButtonState(prev => ({
-      ...prev,
-      [props.taskId]: 'confirm'
-    }));
-
-    const url = `solana:${recipient}?amount=${props.amount}&label=${label}&memo=${memo}&reference=${referenceStr}`;
+    const ref = Keypair.generate().publicKey.toBase58();
+    setReference(ref);
+    setButtonState('confirm');
+    setStatus('');
+    const url = `solana:${recipient}?amount=${props.amount}&label=${label}&memo=${memo}&reference=${ref}`;
     window.open(url, '_blank');
   };
 
-  const VerifyTransaction = async () => {
-    try {
-      setStatus("verifying Transaction...");
-      setErrorId(props.taskId);
-      setButtonState(prev => ({
-        ...prev,
-        [props.taskId]: 'processing'
-      }));
+  const verifyTransaction = () => {
+    setErrorId(props.taskId)
+    setStatus('Verifying...');
+    setButtonState('processing');
+    tryVerify(0); // Start with 0 retries
+  };
 
+  const tryVerify = async (retryCount) => {
+    try {
       await checkAndRefreshToken();
       const token = localStorage.getItem("accessToken");
 
-      const response = await api.post(
+      const res = await api.post(
         `${BackEndUrl}/verify-transaction`,
         {
           reference,
           amount: props.amount,
           fromPubkey: new PublicKey(props.publicKey),
           taskId: props.taskId,
-          reward: props.reward,
+          reward: [props.reward],
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setStatus(response.data.message);
-    } catch (error) {
-      console.log("Error verifying transaction:", error);
-      setStatus( error.response?.data?.message || "❌ Transaction Failed");
-    } finally {
-      setButtonState(prev => ({
-        ...prev,
-        [props.taskId]: 'stake'
-      }));
+
+      setStatus(res.data.message);
+      setButtonState('stake');
+    } catch (err) {
+      if (retryCount < 2) {
+        const nextRetry = retryCount + 1;
+        setStatus(`Retrying... (${nextRetry}/3)`);
+        setTimeout(() => tryVerify(nextRetry), 10000);
+      } else {
+        setStatus('❌ Transaction Failed');
+        setButtonState('stake');
+      }
     }
   };
 
-  const currentState = buttonState[props.taskId] || 'stake';
-  const isDisabled = currentState === 'processing' || !props.connected || !props.publicKey;
+  const isDisabled = props.completed || !props.connected || !props.publicKey || buttonState === 'processing';
 
   return (
     <>
       <button
         disabled={isDisabled}
-        onClick={
-          currentState === 'confirm'
-            ? VerifyTransaction
-            : handleInvest
-        }
-        className={`w-full sm:w-auto text-center ${isDisabled
-          ? "bg-gray-700 cursor-not-allowed"
-          : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
-          } px-4 py-2 rounded-lg text-white font-semibold transition`}
+        onClick={buttonState === 'confirm' ? verifyTransaction : handleInvest}
+        className={`w-full sm:w-auto text-center px-4 py-2 rounded-lg text-white font-semibold transition
+  ${props.completed
+            ? "bg-gray-600 cursor-not-allowed"
+            : isDisabled
+              ? "bg-gray-700 cursor-not-allowed"
+              : buttonState === 'confirm'
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600"
+          }`}
+
       >
-        {currentState === 'stake' && 'Stake'}
-        {currentState === 'confirm' && 'Confirm'}
-        {currentState === 'processing' && 'Processing...'}
+        {props.completed
+          ? 'Completed'
+          : buttonState === 'stake'
+            ? 'Stake'
+            : buttonState === 'confirm'
+              ? 'Confirm'
+              : 'Processing...'}
       </button>
 
       {props.taskId === errorId && (
-        <p className={`mt-1 text-xs ${status.includes("❌") ? "text-red-400" : "text-white"}`}>
+        <p
+          className={`mt-1 text-xs ${status.includes("❌")
+            ? "text-red-400"
+            : "text-white"
+            }`}
+        >
           {status}
         </p>
       )}
