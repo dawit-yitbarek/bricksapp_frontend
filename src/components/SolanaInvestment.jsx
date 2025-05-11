@@ -240,6 +240,7 @@ const SolanaInvestment = () => {
               taskId={task.id} publicKey={publicKey} 
               connected={connected} 
               reward={task.reward_point} 
+              completed={isCompleted}
               refresh={() => setRefreshFlag((prev) => prev + 1)}/>
             }
 
