@@ -195,7 +195,7 @@ const SolanaInvestment = () => {
           <span className="text-gray-300">
             {!isCompleted
               ? `Amount Required: ${task.amount_required} SOL`
-              : `Reward Point: ${task.reward_point} SOL`}
+              : `Reward Point: ${task.reward_point}`}
           </span>
 
           <div className="relative flex flex-col items-start sm:items-center w-full sm:w-fit">

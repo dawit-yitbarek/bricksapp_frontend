@@ -34,7 +34,16 @@ function Header(props) {
   return (
     <>
       <header className="w-full bg-gray-900 px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-50">
-        <h1 className="text-xl font-bold text-white">🌙 Airdrop</h1>
+
+        <Link to="/" className="flex items-center gap-3 text-white">
+          <img
+            src="/img/logo.png"
+            alt="Nova Realm Logo"
+            className="h-10 w-10 rounded-full object-cover"
+          />
+          <h1 className="text-2xl text-purple-400 tracking-wide orbitron-font"> Bricks App </h1>
+        </Link>
+
 
         {/* Hamburger button for mobile */}
         <button
@@ -144,4 +153,4 @@ function Header(props) {
 }
 
 export default Header;
-export {LogoutBtn};
+export { LogoutBtn };

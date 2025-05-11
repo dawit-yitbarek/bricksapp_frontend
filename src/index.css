@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 html {
   scroll-behavior: smooth;
   margin: 0;
@@ -6,6 +7,7 @@ html {
   height: 100%;
   width: 100%;
 }
+
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
@@ -20,6 +22,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -35,6 +38,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -42,6 +46,17 @@ body {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.orbitron-font {
+  font-family: 'Orbitron', sans-serif;
 }
