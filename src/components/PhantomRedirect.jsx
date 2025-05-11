@@ -53,14 +53,14 @@ const PhantomRedirect = () => {
         const walletAddress = payload.public_key;
 
         const token = localStorage.getItem("accessToken");
-        await api.post(`${BackEndUrl}/connect-wallet`, {
+        const response = await api.post(`${BackEndUrl}/connect-wallet`, {
           address: walletAddress,
           walletName: "Phantom",
         }, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        navigate("/dashboard");
+        navigate("/dashboard", { state: { walletError: response.data?.message } });
       } catch (error) {
         console.error("Error in PhantomRedirect:", error);
         navigate("/dashboard", { state: { walletError: "Unexpected error during wallet connection." } });
