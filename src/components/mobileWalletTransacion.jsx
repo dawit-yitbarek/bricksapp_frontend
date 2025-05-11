@@ -50,6 +50,7 @@ const SolanaInvestmentMobile = (props) => {
 
       setStatus(res.data.message);
       setButtonState('stake');
+      props.refresh()
     } catch (err) {
       if (retryCount < 2) {
         const nextRetry = retryCount + 1;
@@ -58,9 +59,8 @@ const SolanaInvestmentMobile = (props) => {
       } else {
         setStatus( err.response?.data?.message ||'❌ Transaction Failed');
         setButtonState('stake');
+        props.refresh()
       }
-    }finally{
-      props.refresh()
     }
   };
 
