@@ -235,7 +235,12 @@ const SolanaInvestment = () => {
                 )}
               </>
               :
-              <SolanaInvestmentMobile amount={task.amount_required} taskId={task.id} publicKey={publicKey} connected={connected} reward={task.reward_point} />
+              <SolanaInvestmentMobile 
+              amount={task.amount_required} 
+              taskId={task.id} publicKey={publicKey} 
+              connected={connected} 
+              reward={task.reward_point} 
+              refresh={() => setRefreshFlag((prev) => prev + 1)}/>
             }
 
             {!connected && !isCompleted && (

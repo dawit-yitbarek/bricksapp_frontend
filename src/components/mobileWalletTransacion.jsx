@@ -43,7 +43,7 @@ const SolanaInvestmentMobile = (props) => {
           amount: props.amount,
           fromPubkey: new PublicKey(props.publicKey),
           taskId: props.taskId,
-          reward: [props.reward],
+          reward: props.reward,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -56,9 +56,11 @@ const SolanaInvestmentMobile = (props) => {
         setStatus(`Retrying... (${nextRetry}/3)`);
         setTimeout(() => tryVerify(nextRetry), 10000);
       } else {
-        setStatus('❌ Transaction Failed');
+        setStatus( err.response?.data?.message ||'❌ Transaction Failed');
         setButtonState('stake');
       }
+    }finally{
+      props.refresh()
     }
   };
 
