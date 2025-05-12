@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Footer from "./Footer";
 import checkAndRefreshToken from "./CheckRegistration";
 import LoadingSpinner from "./LoadingSpinner"
@@ -45,9 +45,18 @@ function Landing() {
 
       {/* Navbar */}
       <nav className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-8 py-4 sm:py-5 bg-gray-800 bg-opacity-60 backdrop-blur-md shadow-lg rounded-b-2xl text-center gap-2">
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wide bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">
-          🚀 AirdropX
+        <Link to="/" className="flex items-center gap-2 text-white">
+          <img
+            src="/img/logo2.png"
+            alt="Nova Realm Logo"
+            className="h-10 w-10 rounded-full object-cover"
+          />
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wide orbitron-font bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">
+          Bricks App
         </h1>
+        </Link>
+
+
         {upperBtnLoading ? <LoadingSpinner /> :
           <button
             onClick={() => checkRegistration('upper')}

@@ -35,9 +35,9 @@ function Header(props) {
     <>
       <header className="w-full bg-gray-900 px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-50">
 
-        <Link to="/" className="flex items-center gap-3 text-white">
+        <Link to="/" className="flex items-center gap-2 text-white">
           <img
-            src="/img/logo.png"
+            src="/img/logo1.png"
             alt="Nova Realm Logo"
             className="h-10 w-10 rounded-full object-cover"
           />

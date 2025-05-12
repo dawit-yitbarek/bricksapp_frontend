@@ -13,6 +13,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import CheckDevice from "./mobileOrDesktop";
 import MobileConnectButton from "./mobileWalletConnect";
 import checkAndRefreshToken from "./CheckRegistration";
+import { dashboardPlaceholder } from "./PlaceholderProvider";
 
 const BackendUrl = import.meta.env.VITE_BACKEND_URL;
 const FrontendUrl = import.meta.env.VITE_FRONTEND_URL;
@@ -24,8 +25,8 @@ const Dashboard = () => {
   const [publicKey, setPublicKey] = useState(null);
   const [connected, setConnected] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(0);
-  const [userInfo, setUserInfo] = useState();
-  const [referBonus, setReferBonus] = useState(0);
+  const [userInfo, setUserInfo] = useState(dashboardPlaceholder);
+  const [referBonus, setReferBonus] = useState("---");
   const [isSpinning, setIsSpinning] = useState(false);
   const [copied, setCopied] = useState(false);
   const [streakLoading, setStreakLoading] = useState(false);
@@ -53,7 +54,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     setWalletError(location.state?.walletError)
-    // Clear walletError from location.state so it doesn't persist
     navigate(location.pathname, { replace: true, state: {} });
     async function fetchData() {
       setStreakLoading(true);
@@ -68,6 +68,7 @@ const Dashboard = () => {
         });
 
         if (response.data.success) {
+          console.log("success")
           setUserInfo(response.data);
         } else {
           await LogoutBtn();
@@ -133,11 +134,12 @@ const Dashboard = () => {
             </button>
 
             <img
-              src={userInfo?.avatar_url || "/img/fallback.png"}
+              src={userInfo?.avatar_url || "/img/fallback2.png"}
               alt="Avatar"
               className="w-20 h-20 rounded-full mb-3"
             />
             <h3 className="text-lg sm:text-2xl font-semibold mb-1">{userInfo?.name}</h3>
+
 
             {connected && publicKey ? (
               <div className="flex items-center gap-2 text-sm sm:text-base">
@@ -161,7 +163,7 @@ const Dashboard = () => {
                 <div className="mt-3">
                   {desktop ? <WalletMultiButton /> : <MobileConnectButton />}
                 </div>
-                {error || walletError && (
+                {( error || walletError ) && (
                   <p className="text-sm text-red-500 mt-2">{error || walletError}</p>
                 )}
               </>
@@ -171,7 +173,7 @@ const Dashboard = () => {
               <div className="text-left">
                 <p className="uppercase text-xs mb-1">Your Points</p>
                 <p className="text-purple-500 text-xl sm:text-2xl font-bold">
-                  {userInfo?.point?.toLocaleString()}
+                  { userInfo?.point.toLocaleString() }
                 </p>
               </div>
               <div className="text-right">

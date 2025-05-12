@@ -70,7 +70,11 @@ const PhantomRedirect = () => {
     run();
   }, [navigate]);
 
-  return <div className="text-center mt-10 text-lg">Connecting...</div>;
+  return <div className="h-screen flex items-center justify-center bg-gray-900 overflow-hidden">
+    <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-indigo-600 to-blue-500 animate-pulse text-center px-4">
+      Connecting...
+    </h1>
+  </div>;
 };
 
 export default PhantomRedirect;

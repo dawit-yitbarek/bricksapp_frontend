@@ -8,13 +8,14 @@ import checkAndRefreshToken from "./CheckRegistration";
 import Header from "./Header";
 import Footer from "./Footer";
 import LoadingSpinner from "./LoadingSpinner"
+import { tasksPlaceholder } from "./PlaceholderProvider";
 
 
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 function Tasks() {
-  const [completedTasks, setCompletedTasks] = useState([]);
-  const [incompletedTasks, setIncompletedTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState(tasksPlaceholder);
+  const [incompletedTasks, setIncompletedTasks] = useState(tasksPlaceholder);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const [verifyComplete, setVerifyComplete] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState(null);

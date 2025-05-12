@@ -14,6 +14,7 @@ import MobileConnectButton from "./mobileWalletConnect";
 import { useWalletError } from "./WalletErrorContext";
 import checkAndRefreshToken from "./CheckRegistration";
 import SolanaInvestmentMobile from "./mobileWalletTransacion"
+import { investmentTasksPlaceholder } from "./PlaceholderProvider";
 
 
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
@@ -27,8 +28,8 @@ const SolanaInvestment = () => {
   const [publicKey, setPublicKey] = useState(null);
   const [connected, setConnected] = useState(false);
   const [desktop, setDesktop] = useState(true);
-  const [completedTasks, setCompletedTasks] = useState([]);
-  const [incompleteTasks, setIncompleteTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState(investmentTasksPlaceholder);
+  const [incompleteTasks, setIncompleteTasks] = useState(investmentTasksPlaceholder);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const [status, setStatus] = useState("");
   const [errorId, setErrorId] = useState(null);
@@ -195,7 +196,7 @@ const SolanaInvestment = () => {
           <span className="text-gray-300">
             {!isCompleted
               ? `Amount Required: ${task.amount_required} SOL`
-              : `Reward Point: ${task.reward_point}`}
+              : `Reward Point: ${task.reward_point} `}
           </span>
 
           <div className="relative flex flex-col items-start sm:items-center w-full sm:w-fit">

@@ -1,15 +1,17 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import api from './Api';
 import Footer from "./Footer";
+import {leaderboardPlaceholder} from "./PlaceholderProvider";
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 
 function Leaderboard() {
   const navigate = useNavigate();
-  const [topThree, setTopThree] = useState([]);
-  const [others, setOthers] = useState([]);
-  const [currentUser, setCurrentUser] = useState([]);
+  const [topThree, setTopThree] = useState(leaderboardPlaceholder.topThree);
+  const [others, setOthers] = useState(leaderboardPlaceholder.others);
+  const [currentUser, setCurrentUser] = useState(leaderboardPlaceholder.currentUser);
 
   useEffect(() => {
     async function fetchLeaderboard() {

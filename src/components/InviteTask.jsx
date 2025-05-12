@@ -1,14 +1,14 @@
-// InviteFriendSection.jsx
 import React, { useState, useEffect } from 'react';
+import { referralTasksPlaceholder } from './PlaceholderProvider';
 const FrontEndUrl = import.meta.env.VITE_FRONTEND_URL;
 const BackEndUrl = import.meta.env.VITE_BACKEND_URL;
 import api from './Api';
 
 const InviteFriendSection = () => {
-    const [referralCode, setRefferalCode] = useState('');
+    const [referralCode, setRefferalCode] = useState("");
     const [copied, setCopied] = useState(false);
-    const [completedTasks, setCompletedTasks] = useState([]);
-    const [incompleteTasks, setIncompleteTasks] = useState([]);
+    const [completedTasks, setCompletedTasks] = useState(referralTasksPlaceholder);
+    const [incompleteTasks, setIncompleteTasks] = useState(referralTasksPlaceholder);
 
 
     const referralLink = `${FrontEndUrl}/register?ref=${referralCode}`;
@@ -17,7 +17,7 @@ const InviteFriendSection = () => {
         const fetchTasks = async () => {
             try {
                 const accessToken = localStorage.getItem("accessToken");
-                const response = await api.get(`${BackEndUrl}/referral-tasks` , {headers: {Authorization: `Bearer ${accessToken}`,},});
+                const response = await api.get(`${BackEndUrl}/referral-tasks`, { headers: { Authorization: `Bearer ${accessToken}`, }, });
                 if (response.data.success) {
                     setCompletedTasks(response.data?.completedTasks || []);
                     setIncompleteTasks(response.data?.incompleteTasks || []);

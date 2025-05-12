@@ -102,7 +102,7 @@ const StreakCard = (props) => {
         <p className="text-sm sm:text-md font-medium mb-6 text-center">
           {props.isClaimed
             ? "You've claimed your reward today!"
-            : `🎁 Claim today's bonus: ${props.currentStreak * 1000} points`}
+            : `🎁 Claim today's bonus: ${ props.currentStreak * 1000 || "---" } points`}
         </p>
 
         {!loading && !props.streakLoading ? (
