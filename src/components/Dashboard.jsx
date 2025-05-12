@@ -134,7 +134,7 @@ const Dashboard = () => {
             </button>
 
             <img
-              src={userInfo?.avatar_url || "/img/fallback2.png"}
+              src={userInfo?.avatar_url || "/img/fallback.png"}
               alt="Avatar"
               className="w-20 h-20 rounded-full mb-3"
             />

@@ -53,7 +53,7 @@ function leaderboadrProvider(len, type) {
             leaderboard.push(
             {
                 id: i,
-                avatar_url: "/img/fallback2.png",
+                avatar_url: "/img/fallback.png",
                 name: skeleton,
                 point: skeleton,
                 rank: i+1
@@ -63,7 +63,7 @@ function leaderboadrProvider(len, type) {
             leaderboard.push(
             {
                 id: i,
-                avatar_url: "/img/fallback2.png",
+                avatar_url: "/img/fallback.png",
                 name: skeleton,
                 point: skeleton,
                 rank: i+4
@@ -100,7 +100,7 @@ export const leaderboardPlaceholder = {
     others: leaderboadrProvider(7, "others"),
 
     currentUser: {
-        avatar_url: "/img/fallback2.png",
+        avatar_url: "/img/fallback.png",
         name: skeleton,
         point: skeleton,
         rank: skeleton,
